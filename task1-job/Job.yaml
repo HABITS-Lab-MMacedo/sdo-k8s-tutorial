@@ -1,0 +1,29 @@
+apiVersion: batch/v1    # The version of the Kubernetes API used to create this Job
+kind: Job                # Tells Kubernetes this is a one-time task, not a continuously running server
+metadata:               # Data that helps uniquely identify this resource
+  name: expo-job         # The name of the Job (this is what you will see when running 'kubectl get jobs')
+spec:                   # The blueprint for how the Job itself should behave
+  backoffLimit: 0       # The number of retries if the task fails (0 means do not retry if it crashes)
+  template:             # The blueprint for the Pod that this Job will create and manage
+    spec:               # The configuration details for the Pod itself
+      restartPolicy: Never        # If the container stops, never restart it (perfect for a math calculation)
+      containers:                 # The list of containers that will be run in the Pod
+      - name: expo-application     # The name we are giving to this container
+        image: expo:1.0           # The local Docker image you built using 'minikube image build'
+        imagePullPolicy: IfNotPresent  # Use the locally built image instead of trying to download it from the internet
+        args: ["3", "10"]             # the arguments to pass to the container (argv[1] = base, argv[2] = exponent)
+        resources:                    # The resources that the container will need
+          limits:                     # The maximum resources that the container can use
+            memory: "64Mi"
+            cpu: "250m"
+          requests:                     # The minimum resources that the container needs to run
+            memory: "16Mi"              # The minimum memory the container needs to run
+            cpu: "50m"                  # The minimum CPU the container needs to run
+
+
+
+#minikube image build -t expo:1.0 . 
+#kubectl apply -f job.yaml 
+#kubectl get pods 
+#kubectl logs job/expo-job 
+#kubectl delete –f job.yaml  
